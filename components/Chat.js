@@ -1,11 +1,23 @@
-import { View } from "react-native";
+    import { View, Text, StyleSheet } from "react-native";
 
-const Chat = () => {
-    return (
-        <View>
-            <Text> Happy Chatting</Text>
-        </View>
-    )
-}
+    const Chat = ({ route }) => {
+            return (
+                <View style={[styles.container, { backgroundColor:route.params.color}]}>
+                    <Text>Chat</Text>
+                </View>
+            )
+        }
+        const styles = StyleSheet.create({
+            container: {
+            flex: 1,
+            justifyContent: 'center',
+                alignItems: 'center',
+                color: 'white'
+            }
+        });
 
-export default Chat;
+        //to set title in the navigation bar
+        Chat.navigationOptions = ({ route }) => ({
+            title: route.params.nameText
+        });
+        export default Chat;
