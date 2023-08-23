@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { ImageBackground, TouchableOpacity } from "react-native";
 
 const Start = ({ navigation }) => {
@@ -11,54 +11,56 @@ const Start = ({ navigation }) => {
       style={styles.imageBackground}
       source={require("./images/background.jpg")}
     >
-      <TextInput
-        style={styles.textInput}
-        value={nameText}
-        onChangeText={setnameText}
-        placeholder="Enter your name"
-      ></TextInput>
-
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.darkseagreen}
-          onPress={() => setColor("darkseagreen")}
-        ></TouchableOpacity>
-        <TouchableOpacity
-          style={styles.thistle}
-          onPress={() => setColor("thistle")}
-        ></TouchableOpacity>
-        <TouchableOpacity
-          style={styles.powderblue}
-          onPress={() => setColor("powderblue")}
-        ></TouchableOpacity>
-        <TouchableOpacity
-          style={styles.lavender}
-          onPress={() => setColor("lavender")}
-        ></TouchableOpacity>
+        <TextInput
+          style={styles.textInput}
+          value={nameText}
+          onChangeText={setnameText}
+          placeholder="Enter your name"
+        ></TextInput>
+        <View style={styles.colorBox}>
+          <TouchableOpacity
+            style={styles.darkseagreen}
+            onPress={() => setColor("darkseagreen")}
+          ></TouchableOpacity>
+          <TouchableOpacity
+            style={styles.thistle}
+            onPress={() => setColor("thistle")}
+          ></TouchableOpacity>
+          <TouchableOpacity
+            style={styles.powderblue}
+            onPress={() => setColor("powderblue")}
+          ></TouchableOpacity>
+          <TouchableOpacity
+            style={styles.lavender}
+            onPress={() => setColor("lavender")}
+          ></TouchableOpacity>
+        </View>
+        <Button
+          title="Start Chatting"
+          onPress={() =>
+            navigation.navigate("Chat", { nameText: nameText, color: color })
+          }
+        />
       </View>
-
-      <Button
-        title="Start Chatting"
-        onPress={() =>
-          navigation.navigate("Chat", { nameText: nameText, color: color })
-        }
-      />
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  colorBox: {
     flexDirection: "row",
     padding: 8,
   },
+  container: {
+    backgroundColor: "gray",
+    padding: 10,
+  },
   textInput: {
     borderWidth: 1,
-    width: "80%",
     padding: 15,
     margin: 4,
     fontSize: 20,
-    backgroundColor: "white",
   },
   imageBackground: {
     flex: 1,
