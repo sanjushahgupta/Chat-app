@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import { ImageBackground, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  StyleSheet,
+} from "react-native";
 
 const Start = ({ navigation }) => {
   const [nameText, setnameText] = useState("");
@@ -18,6 +26,9 @@ const Start = ({ navigation }) => {
           onChangeText={setnameText}
           placeholder="Enter your name"
         ></TextInput>
+        <Text style={{ color: "#D3D3D3", fontSize: 18, paddingLeft: 10 }}>
+          Choose background Color
+        </Text>
         <View style={styles.colorBox}>
           <TouchableOpacity
             style={styles.darkseagreen}
@@ -42,6 +53,12 @@ const Start = ({ navigation }) => {
             navigation.navigate("Chat", { nameText: nameText, color: color })
           }
         />
+        {Platform.OS === "android" ? (
+          <KeyboardAvoidingView behavior="height" />
+        ) : null}
+        {Platform.OS === "ios" ? (
+          <KeyboardAvoidingView behavior="padding" />
+        ) : null}
       </View>
     </ImageBackground>
   );
@@ -54,7 +71,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "gray",
-    padding: 10,
+    padding: 15,
   },
   textInput: {
     borderWidth: 1,
