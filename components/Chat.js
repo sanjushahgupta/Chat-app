@@ -16,6 +16,12 @@ const Chat = ({ route }) => {
           name: "React Native",
         },
       },
+      {
+        _id: 2,
+        text: "This is a system message",
+        createdAt: new Date(),
+        system: true,
+      },
     ]);
   }, []);
   const onSend = (newMessages) => {

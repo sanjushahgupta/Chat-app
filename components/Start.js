@@ -26,12 +26,13 @@ const Start = ({ navigation }) => {
           onChangeText={setnameText}
           placeholder="Enter your name"
         ></TextInput>
-        <Text style={{ color: "#D3D3D3", fontSize: 18, paddingLeft: 10 }}>
-          Choose background Color
-        </Text>
+        <Text style={styles.colorPickerText}>Choose background Color</Text>
         <View style={styles.colorBox}>
           <TouchableOpacity
             style={styles.darkseagreen}
+            accessible={true}
+            accessibilityLabel="choose color"
+            accessibilityHint="Use darkseagreen"
             onPress={() => setColor("darkseagreen")}
           ></TouchableOpacity>
           <TouchableOpacity
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
     margin: 4,
     fontSize: 20,
   },
+  colorPickerText: { color: "#525354", fontSize: 18, paddingLeft: 10 },
   imageBackground: {
     flex: 1,
     justifyContent: "center",
