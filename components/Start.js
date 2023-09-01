@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
-import { ImageBackground, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  StyleSheet,
+} from "react-native";
 
 const Start = ({ navigation }) => {
   const [nameText, setnameText] = useState("");
@@ -18,9 +26,13 @@ const Start = ({ navigation }) => {
           onChangeText={setnameText}
           placeholder="Enter your name"
         ></TextInput>
+        <Text style={styles.colorPickerText}>Choose background Color</Text>
         <View style={styles.colorBox}>
           <TouchableOpacity
             style={styles.darkseagreen}
+            accessible={true}
+            accessibilityLabel="choose color"
+            accessibilityHint="Use darkseagreen"
             onPress={() => setColor("darkseagreen")}
           ></TouchableOpacity>
           <TouchableOpacity
@@ -42,6 +54,12 @@ const Start = ({ navigation }) => {
             navigation.navigate("Chat", { nameText: nameText, color: color })
           }
         />
+        {Platform.OS === "android" ? (
+          <KeyboardAvoidingView behavior="height" />
+        ) : null}
+        {Platform.OS === "ios" ? (
+          <KeyboardAvoidingView behavior="padding" />
+        ) : null}
       </View>
     </ImageBackground>
   );
@@ -54,7 +72,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: "gray",
-    padding: 10,
+    padding: 15,
   },
   textInput: {
     borderWidth: 1,
@@ -62,6 +80,7 @@ const styles = StyleSheet.create({
     margin: 4,
     fontSize: 20,
   },
+  colorPickerText: { color: "#525354", fontSize: 18, paddingLeft: 10 },
   imageBackground: {
     flex: 1,
     justifyContent: "center",
