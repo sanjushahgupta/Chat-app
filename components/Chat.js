@@ -1,33 +1,38 @@
-import { View, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { View, KeyboardAvoidingView } from "react-native";
 import { useState, useEffect } from "react";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
-const Chat = ({ route }) => {
+const Chat = ({ route, db, navigation }) => {
+  const { userID, nameText } = route.params;
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-        },
-      },
-      {
-        _id: 2,
-        text: "This is a system message",
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
+    navigation.setOptions({ title: nameText });
+    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    const unsubMessaginglists = onSnapshot(q, (documentsSnapshot) => {
+      let newLists = [];
+      documentsSnapshot.forEach((doc) => {
+        newLists.push({
+          _id: doc.id,
+          ...doc.data(),
+          createdAt: new Date(doc.data().createdAt.toMillis()),
+        });
+      });
+      setMessages(newLists);
+    });
+    return () => {
+      if (unsubMessaginglists) unsubMessaginglists();
+    };
   }, []);
-  const onSend = (newMessages) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages)
-    );
+  const onSend = async (newMessages) => {
+    addDoc(collection(db, "messages"), newMessages[0]);
   };
 
   return (
@@ -37,7 +42,8 @@ const Chat = ({ route }) => {
         renderBubble={renderBubble}
         onSend={(messages) => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userID,
+          name: nameText,
         }}
       />
       {Platform.OS === "android" ? (
@@ -49,20 +55,6 @@ const Chat = ({ route }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-  },
-});
-
-//to set title in the navigation bar
-Chat.navigationOptions = ({ route }) => ({
-  title: route.params.nameText,
-});
 
 const renderBubble = (props) => {
   return (
