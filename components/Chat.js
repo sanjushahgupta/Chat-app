@@ -1,6 +1,7 @@
-import { View, KeyboardAvoidingView } from "react-native";
+import { View, KeyboardAvoidingView, LogBox } from "react-native";
 import { useState, useEffect } from "react";
-import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   collection,
   addDoc,
@@ -8,31 +9,78 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-
-const Chat = ({ route, db, navigation }) => {
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+const Chat = ({ route, db, navigation, isConnected }) => {
   const { userID, nameText } = route.params;
   const [messages, setMessages] = useState([]);
 
+  const loadCachedLists = async () => {
+    const cachedLists = (await AsyncStorage.getItem("messages_lists")) || [];
+    setMessages(JSON.parse(cachedLists));
+  };
+
+  let unsubMessaginglists;
   useEffect(() => {
     navigation.setOptions({ title: nameText });
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-    const unsubMessaginglists = onSnapshot(q, (documentsSnapshot) => {
-      let newLists = [];
-      documentsSnapshot.forEach((doc) => {
-        newLists.push({
-          _id: doc.id,
-          ...doc.data(),
-          createdAt: new Date(doc.data().createdAt.toMillis()),
+
+    if (isConnected === true) {
+      if (unsubMessaginglists) unsubMessaginglists();
+      unsubShoppinglists = null;
+
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      unsubMessaginglists = onSnapshot(q, async (documentsSnapshot) => {
+        let newLists = [];
+        documentsSnapshot.forEach((doc) => {
+          newLists.push({
+            _id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
         });
+        cachedLists(newLists);
+        setMessages(newLists);
       });
-      setMessages(newLists);
-    });
+    } else {
+      loadCachedLists();
+    }
+
     return () => {
       if (unsubMessaginglists) unsubMessaginglists();
     };
-  }, []);
-  const onSend = async (newMessages) => {
+  }, [isConnected]);
+
+  const cachedLists = async (newLists) => {
+    try {
+      await AsyncStorage.setItem("messages_lists", JSON.stringify(newLists));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
+  };
+  const renderInputToolbar = (props) => {
+    if (isConnected) {
+      return <InputToolbar {...props} />;
+    } else {
+      return null;
+    }
+  };
+
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: "black",
+          },
+          left: {
+            backgroundColor: "white",
+          },
+        }}
+      />
+    );
   };
 
   return (
@@ -40,6 +88,7 @@ const Chat = ({ route, db, navigation }) => {
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
@@ -53,22 +102,6 @@ const Chat = ({ route, db, navigation }) => {
         <KeyboardAvoidingView behavior="padding" />
       ) : null}
     </View>
-  );
-};
-
-const renderBubble = (props) => {
-  return (
-    <Bubble
-      {...props}
-      wrapperStyle={{
-        right: {
-          backgroundColor: "black",
-        },
-        left: {
-          backgroundColor: "white",
-        },
-      }}
-    />
   );
 };
 export default Chat;

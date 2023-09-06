@@ -17,7 +17,7 @@ const Start = ({ navigation }) => {
   const [nameText, setnameText] = useState("");
   const [color, setColor] = useState("gray");
   const auth = getAuth();
-  
+
   const signInUser = () => {
     signInAnonymously(auth)
       .then((result) => {
@@ -28,7 +28,7 @@ const Start = ({ navigation }) => {
         });
         Alert.alert("Signed in Successfully!");
       })
-      .catch((error) => {
+      .catch(() => {
         Alert.alert("Unable to sign in, try later again.");
       });
   };
