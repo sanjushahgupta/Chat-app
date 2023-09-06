@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
-import { LogBox } from "react-native";
+import { useEffect } from "react";
+import { Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-import Chat from "./components/Chat";
-import Start from "./components/Start";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 import { initializeApp } from "firebase/app";
 import {
@@ -13,32 +11,29 @@ import {
   enableNetwork,
 } from "firebase/firestore";
 
-import { useNetInfo } from "@react-native-community/netinfo";
+import Chat from "./components/Chat";
+import Start from "./components/Start";
 
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+const Stack = createNativeStackNavigator();
+const firebaseConfig = {
+  apiKey: "AIzaSyD-wMSd1mOZJTHTwoGHGEhyNuy8FxKXiFw",
+  authDomain: "chat-5902a.firebaseapp.com",
+  projectId: "chat-5902a",
+  storageBucket: "chat-5902a.appspot.com",
+  messagingSenderId: "477835469249",
+  appId: "1:477835469249:web:53a320b7123a2c43474f40",
+  measurementId: "G-Y161Z8PDDL",
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const App = () => {
-  const Stack = createNativeStackNavigator();
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyD-wMSd1mOZJTHTwoGHGEhyNuy8FxKXiFw",
-    authDomain: "chat-5902a.firebaseapp.com",
-    projectId: "chat-5902a",
-    storageBucket: "chat-5902a.appspot.com",
-    messagingSenderId: "477835469249",
-    appId: "1:477835469249:web:53a320b7123a2c43474f40",
-    measurementId: "G-Y161Z8PDDL",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
   const connectionStatus = useNetInfo();
-
   useEffect(() => {
-    if (connectionStatus.isConnected() == false) {
-      Alert.alert("Connection lost!");
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection Lost!");
       disableNetwork(db);
-    } else if (connectionStatus.isConnected() == true) {
+    } else if (connectionStatus.isConnected === true) {
       enableNetwork(db);
     }
   }, [connectionStatus.isConnected]);
