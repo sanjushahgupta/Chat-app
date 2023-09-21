@@ -1,10 +1,10 @@
 # Chat App
-A chat app using React Native which provides users with a chat interface and options to share images and their location.
+A chat application built with React Native that allows users to chat and share both images and their current location.
 
 ## Features
 - Enter name and choose a background color for the chat screen
 - Chat with friends
-- Share pictures, photos, and location
+- Share photos, and location
 - Store chats locally using asyncStorage so they’re available offline
 - Authenticate users and store chat messages in Firestore
 
@@ -32,7 +32,7 @@ A chat app using React Native which provides users with a chat interface and opt
 - Go to Firebase Console and make a new project
 - Change the rules to allow read and write
 - Set up Firebase Authentication and Firestore Database
-- Get Firebase configuration and put it in the project
+- Get Firebase configuration and add it in the project
 
 ## Dependencies to Install
 Install using npm or yarn: 
