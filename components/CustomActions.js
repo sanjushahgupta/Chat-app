@@ -64,7 +64,6 @@ const CustomActions = ({
     if (permissions?.granted) {
       let location = await Location.getCurrentPositionAsync({});
       if (location) {
-        console.log("location", location);
         onSend({
           location: {
             longitude: location.coords.longitude,
@@ -100,10 +99,8 @@ const CustomActions = ({
   const uploadAndSendPic = async (imageURI) => {
     const uniqueRefString = generateReference(imageURI);
     const newUploadRef = ref(storage, uniqueRefString);
-    console.log("on the way");
     const blob = await convertFileToBlob(imageURI);
     uploadBytes(newUploadRef, blob).then(async (snapshot) => {
-      console.log("File uploaded sucessfully");
       const imageURL = await getDownloadURL(snapshot.ref);
       onSend({ image: imageURL });
     });
