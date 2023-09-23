@@ -1,7 +1,9 @@
+import React, { useState, useEffect } from "react"; // Import React and hooks
 import { View, KeyboardAvoidingView, LogBox } from "react-native";
-import { useState, useEffect } from "react";
 import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 import {
   collection,
   addDoc,
@@ -10,7 +12,8 @@ import {
   orderBy,
 } from "firebase/firestore";
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
-const Chat = ({ route, db, navigation, isConnected }) => {
+
+const Chat = ({ route, db, navigation, isConnected, storage }) => {
   const { userID, nameText } = route.params;
   const [messages, setMessages] = useState([]);
 
@@ -22,10 +25,11 @@ const Chat = ({ route, db, navigation, isConnected }) => {
   let unsubMessaginglists;
   useEffect(() => {
     navigation.setOptions({ title: nameText });
-
+    const cleanup = () => {
+      if (unsubMessaginglists) unsubMessaginglists(); // Cleanup unsubMessaginglists
+    };
     if (isConnected === true) {
       if (unsubMessaginglists) unsubMessaginglists();
-      unsubShoppinglists = null;
 
       const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
       unsubMessaginglists = onSnapshot(q, async (documentsSnapshot) => {
@@ -43,10 +47,7 @@ const Chat = ({ route, db, navigation, isConnected }) => {
     } else {
       loadCachedLists();
     }
-
-    return () => {
-      if (unsubMessaginglists) unsubMessaginglists();
-    };
+    return cleanup;
   }, [isConnected]);
 
   const cachedLists = async (newLists) => {
@@ -56,9 +57,11 @@ const Chat = ({ route, db, navigation, isConnected }) => {
       console.log(error.message);
     }
   };
+
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
+
   const renderInputToolbar = (props) => {
     if (isConnected) {
       return <InputToolbar {...props} />;
@@ -83,12 +86,36 @@ const Chat = ({ route, db, navigation, isConnected }) => {
     );
   };
 
+  const renderCustomActions = (props) => {
+    return <CustomActions storage={storage} userID={userID} {...props} />;
+  };
+
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: route.params.color }}>
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
